@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ROOTS FINAL ASSESSMENT</title>
+  <style>
+    body {
+      background-color: #fff0d9;
+      font-family: Arial, sans-serif;
+      margin: 0; /* Remove default body margin */
+    }
+
+    #header {
+      background-color: #ff9800;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* Style for the logo image */
+    #logo {
+      max-width: 200px; /* Adjust the maximum width of the logo as needed */
+      height: auto; /* Maintain the aspect ratio of the logo */
+    }
+
+    .timer-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .timer {
+      font-size: 48px;
+      text-align: center;
+      color: #fff;
+      background-color: #4259c1;
+      padding: 10px;
+      transition: background-color 0.5s ease;
+      margin-bottom: 20px;
+      animation: pulse 1s infinite;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .timer.red {
+      background-color: #ff4136;
+    }
+
+    .submission-message {
+      font-size: 24px;
+      text-align: center;
+      margin-top: 20px;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    #submission-success {
+      color: #2ecc40;
+    }
+
+    #submission-failure {
+      color: #ff4136;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Media query for smaller screens (e.g., phones) */
+    @media (max-width: 600px) {
+      .timer {
+        font-size: 32px;
+      }
+    }
+
+    /* Media query for medium-sized screens (e.g., tablets) */
+    @media (min-width: 601px) and (max-width: 1024px) {
+      .timer {
+        font-size: 40px;
+      }
+    }
+
+    /* Media query for larger screens (e.g., desktops) */
+    @media (min-width: 1025px) {
+      /* You can add specific styles for larger screens here if needed */
+    }
+
+
+  </style>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="header">
+    <!-- Add your logo image here -->
+    <img id="logo" src="logo.png" alt="The New School of Discipleshp Logo">
+
+    <h1>ROOTS Final Assessment</h1>
+  </div>
+
+  <div class="timer-wrapper">
+    <div class="timer" id="top-timer"></div>
+    <div class="submission-message" id="top-submission-message"></div>
+  </div>
+
+  <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfIOV1fIL_pWHFW549OITeze2PGBgV9vY8o8YpkxojUyPy1kw/viewform?usp=sf_link" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+
+  <div class="timer-wrapper">
+    <div class="timer" id="bottom-timer"></div>
+    <div class="submission-message" id="bottom-submission-message"></div>
+  </div>
+
+  <script>
+    var countdownMinutes = 60; // Adjust the countdown time in minutes
+    var topDisplay = document.getElementById('top-timer');
+    var topSubmissionMessage = document.getElementById('top-submission-message');
+    var bottomDisplay = document.getElementById('bottom-timer');
+    var bottomSubmissionMessage = document.getElementById('bottom-submission-message');
+    var submitButtonClicked = false;
+
+    function startTimer(duration) {
+      var timer = duration * 60;
+      var intervalId = setInterval(function () {
+        var minutes = Math.floor(timer / 60);
+        var seconds = timer % 60;
+
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+
+        topDisplay.textContent = minutes + ':' + seconds;
+        bottomDisplay.textContent = minutes + ':' + seconds;
+
+        if (timer <= 0 && !submitButtonClicked) {
+          submitButtonClicked = true;
+          clearInterval(intervalId);
+          startInvalidSubmissionCountdown();
+        } else if (timer === 300) {
+          topDisplay.classList.add('red');
+          bottomDisplay.classList.add('red');
+          showNotification('This Assessment Closes Automatically in 5 Minutes. Ensure You Click The Submit Button Before This Happens');
+        }
+
+        timer--;
+      }, 1000);
+    }
+
+    function showNotification(message) {
+      alert(message);
+    }
+
+    function startInvalidSubmissionCountdown() {
+      var invalidSubmissionTimer = 60;
+      var topMessage = 'This Assessment Would Close Without Submitting Automatically in ' + invalidSubmissionTimer + ' Seconds. Submit Your Work NOW to Avoid Losing Your Progress.';
+      var bottomMessage = 'This Assessment Would Close Without Submitting Automatically in ' + invalidSubmissionTimer + ' Seconds. Submit Your Work NOW to Avoid Losing Your Progress.';
+
+      topSubmissionMessage.textContent = topMessage;
+      bottomSubmissionMessage.textContent = bottomMessage;
+
+      var countdownId = setInterval(function () {
+        if (invalidSubmissionTimer <= 0) {
+          clearInterval(countdownId);
+          topDisplay.textContent = '00:00';
+          bottomDisplay.textContent = '00:00';
+          topSubmissionMessage.textContent = 'Your Assessment was not submitted automatically. You are good to go if you submitted before the timer ran out, otherwise you can send an email to sod@wearethenew.org';
+          bottomSubmissionMessage.textContent = 'Your Assessment was not submitted automatically. You are good to go if you submitted before the timer ran out, otherwise you can send an email to sod@wearethenew.org';
+          removeForm();
+        } else {
+          invalidSubmissionTimer--;
+          topSubmissionMessage.textContent = 'This Assessment Would Close Without Submitting Automatically in ' + invalidSubmissionTimer + ' Seconds. Submit Your Work NOW to Avoid Losing Your Progress.';
+          bottomSubmissionMessage.textContent = 'This Assessment Would Close Without Submitting Automatically in ' + invalidSubmissionTimer + ' Seconds. Submit Your Work NOW to Avoid Losing Your Progress.';
+        }
+      }, 1000);
+    }
+
+    function removeForm() {
+      var iframe = document.querySelector('iframe');
+      if (iframe) {
+        iframe.parentNode.removeChild(iframe);
+      }
+    }
+
+    function submitForm() {
+      var topMessage = 'Your Assessment has been submitted successfully! Well done!';
+      var bottomMessage = 'Your Assessment has been submitted successfully! Well done!';
+
+      topSubmissionMessage.textContent = topMessage;
+      bottomSubmissionMessage.textContent = bottomMessage;
+
+      removeForm();
+    }
+
+    window.onload = function () {
+      startTimer(countdownMinutes);
+    };
+  </script>
+</body>
+</html>
